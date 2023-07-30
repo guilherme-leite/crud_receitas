@@ -25,8 +25,8 @@ function App() {
 
   const getReceitas = async () => {
     try {
-      const res = await axios.get("http://localhost:8800");
-      setReceitas(res.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
+      const res = await axios.get("http://localhost:3000/api/receitas");
+      setReceitas(res.data.data.sort((a, b) => (a.nome > b.nome ? 1 : -1)));
     } catch (error) {
       toast.error(error);
     }
@@ -40,8 +40,8 @@ function App() {
     <>
       <Container>
         <Title>Receitas</Title>
-        <Form onEdit={onEdit} setOnEdit={setOnEdit} getReceitas={getReceitas} />
-        <Grid setOnEdit={setOnEdit} users={receitas} setUsers={setReceitas} />
+        <Form onEdit={onEdit} setOnEdit={setOnEdit} getReceitas={getReceitas}/>
+        <Grid receitas={receitas} setReceitas={setReceitas} setOnEdit={setOnEdit} getReceitas={getReceitas}/>
       </Container>
       <ToastContainer autoClose={3000} position={toast.POSITION.BOTTOM_LEFT} />
       <GlobalStyle />

@@ -1,5 +1,7 @@
-import React, { useRef } from "react";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { toast } from "react-toastify";
 
 const FormContainer = styled.form`
   display: flex;
@@ -18,7 +20,7 @@ const InputArea = styled.div`
 `;
 
 const Input = styled.input`
-  width: 120px;
+  width: 140px;
   padding: 0 10px;
   border: 1px solid #bbb;
   border-radius: 5px;
@@ -36,34 +38,103 @@ const Button = styled.button`
   height: 42px;
 `;
 
-const Form = ({ onEdit }) => {
+const Form = ({ getReceitas, onEdit, setOnEdit }) => {
   const ref = useRef();
+  const [nome, setNome] = useState("");
+  const [tempo_preparacao, setTempo_preparacao] = useState(0);
+  const [num_pessoas, setNum_pessoas] = useState(0);
+  const [dificuldade, setDificuldade] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [preparacao, setPreparacao] = useState("");
+
+  useEffect(() => {
+    if (onEdit) {
+      
+      setNome(onEdit.nome);
+      setTempo_preparacao(onEdit.tempo_preparacao);
+      setNum_pessoas(onEdit.num_pessoas);
+      setDificuldade(onEdit.dificuldade);
+      setCategoria(onEdit.categoria);
+      setPreparacao(onEdit.preparacao);
+    }
+  }, [onEdit]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (
+      nome === "" ||
+      tempo_preparacao === "" ||
+      num_pessoas === "" ||
+      dificuldade === "" ||
+      categoria === "" ||
+      preparacao === ""
+      ) {
+      return toast.warn("Preencha todos os campos");
+    }
+    
+    
+      if (onEdit) {
+      await axios
+        .put("http://localhost:3000/api/receitas/", {
+          codigo_receita : onEdit.codigo_receita,
+          nome: nome,
+          tempo_preparacao: tempo_preparacao,
+          num_pessoas: num_pessoas,
+          dificuldade: dificuldade,
+          categoria: categoria,
+          preparacao: preparacao,
+        })
+        .then(({ data }) => toast.success(data))
+        .catch(({ data }) => toast.error(data));
+    } else {
+      await axios
+        .post("http://localhost:3000/api/receitas/", {
+          nome: nome,
+          tempo_preparacao: tempo_preparacao,
+          num_pessoas: num_pessoas,
+          dificuldade: dificuldade,
+          categoria: categoria,
+          preparacao: preparacao,
+        })
+        .then(({ data }) => toast.success(data))
+        .catch(({ data }) => toast.error(data));
+    }
+    setNome("");
+    setTempo_preparacao("");
+    setNum_pessoas("");
+    setDificuldade("");
+    setCategoria("");
+    setPreparacao("");
+
+    setOnEdit(null);
+    getReceitas();
+  };
 
   return (
-    <FormContainer ref={ref}>
+    <FormContainer ref={ref} onSubmit={handleSubmit}>
       <InputArea>
-        <Label>Nome</Label>
-        <Input name="nome" />
+        <Label >Nome</Label>
+        <Input value={nome} name="nome" onChange={e => setNome(e.target.value)}/>
       </InputArea>
       <InputArea>
         <Label>Tempo de preparação</Label>
-        <Input name="tempo_preparação" />
+        <Input type="number" value={tempo_preparacao} name="tempo_preparação" onChange={e => setTempo_preparacao(e.target.value)}/>
       </InputArea>
       <InputArea>
         <Label>Número de pessoas</Label>
-        <Input name="num_pessoas" />
+        <Input type="number" value={num_pessoas} name="num_pessoas" onChange={e => setNum_pessoas(e.target.value)}/>
       </InputArea>
       <InputArea>
         <Label>Dificuldade</Label>
-        <Input name="dificuldade" />
+        <Input value={dificuldade} name="dificuldade" onChange={e => setDificuldade(e.target.value)}/>
       </InputArea>
       <InputArea>
         <Label>Categoria</Label>
-        <Input name="categoria" />
+        <Input value={categoria} name="categoria" onChange={e => setCategoria(e.target.value)}/>
       </InputArea>
       <InputArea>
         <Label>Preparção</Label>
-        <Input name="preparacao" />
+        <Input value={preparacao} name="preparacao" onChange={e => setPreparacao(e.target.value)}/>
       </InputArea>
 
       <Button type="submit">Salvar</Button>

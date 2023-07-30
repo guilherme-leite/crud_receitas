@@ -1,11 +1,14 @@
 require("dotenv").config();
 require("mysql2");
 
+const cors = require("cors");
+
 const express = require("express");
 const app = express();
 const userRouter = require("./api/users/user.router");
 
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/receitas", userRouter);
 

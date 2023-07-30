@@ -3,7 +3,6 @@ import axios from "axios";
 import styled from "styled-components"
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { getReceitas } from "../../../api/users/user.controller";
 
 const Table = styled.table`
   width: 100%;
@@ -18,10 +17,12 @@ const Table = styled.table`
 
 export const Thead = styled.thead``;
 
+export const Tbody = styled.tbody``;
+
 export const Tr = styled.tr``;
 
 export const Th = styled.th`
-  text-align: start;
+  text-align: center;
   border-button: inset;
   padding-botton: 5px;
 `;
@@ -29,36 +30,51 @@ export const Th = styled.th`
 export const Td = styled.td`
   padding-top: 15px;
   text-align: ${(props) => (props.alignCenter ? "center" : "start")};
-  width: ${(props) => props.width ? props.width : "auto"};
+  width: ${(props) => (props.width ? props.width : "auto")};
 `;
 
-const Grid = ({ receitas }) => {
+const Grid = ({ receitas, setReceitas, setOnEdit, getReceitas }) => {
+  const handleEdit = (item) => {
+    setOnEdit(item);
+  }
+
+  const handleDelete = async (codigo_receita) => {
+    await axios
+    .delete("http://localhost:3000/api/receitas/" + codigo_receita)
+    .then(({ data }) => {
+      getReceitas();
+      toast.success(data);
+    }).catch(({data}) => toast.error(data));
+
+    setOnEdit(null);
+  }
+
   return (
     <Table>
       <Thead>
         <Tr>
           <Th width="30%">Nome</Th>
-          <Th width="30%">Tempo de Preparo</Th>
-          <Th width="20%">Dificuldade</Th>
+          <Th width="30%">Tempo Preparo</Th>
+          <Th width="30%">Dificuldade</Th>
           <Th></Th>
           <Th></Th>
         </Tr>
       </Thead>
-      <tbody>
+      <Tbody>
         {receitas.map((item, i) => (
           <Tr key={i}>
             <Td width="30%">{item.nome}</Td>
             <Td width="30%">{item.tempo_preparo}</Td>
             <Td width="30%">{item.dificuldade}</Td>
-            <Td alignCenter width="5%">
-              <FaEdit />
+            <Td aligncenter="true" width="5%">
+              <FaEdit onClick={() => handleEdit(item)}/>
             </Td>
-            <Td alignCenter width="5%">
-              <FaTrash />
+            <Td aligncenter="true" width="5%">
+              <FaTrash onClick={() => handleDelete(item.codigo_receita)}/>
             </Td>
           </Tr>
         ))}
-      </tbody>
+      </Tbody>
     </Table>
   );
 };

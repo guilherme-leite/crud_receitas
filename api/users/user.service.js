@@ -63,15 +63,17 @@ module.exports = {
     );
   },
   deleta: (codigo_receita, callBack) => {
+    
     pool.query(
-    'DELETE FROM receita WHERE codigo_receita = ?', 
-    [codigo_receita],
-    (err, results) => {
-      if(err) {
-        return callBack(err);
-      }
-      return callBack(null, results[0]);
-      }
-    );
+      'DELETE FROM ingredientes_da_receita WHERE receita_codigo_receita = ?; DELETE FROM receita WHERE codigo_receita = ?', 
+      [codigo_receita, codigo_receita],
+      (err, results) => {
+        if(err) {
+          return callBack(err);
+        }
+        return callBack(null, results[0]);
+        }
+      );
+    
   }
 };
